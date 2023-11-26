@@ -19,7 +19,7 @@
     "watch": "cross-env tsc --watch",
     "test": "cross-env jest",
     "seed": "cross-env medusa seed -f ./data/seed.json",
-    "serve": "medusa start",
+    "serve": "medusa start && medusa-admin build",
     "start": "medusa develop",
     "heroku-postbuild": "medusa migrations run",
     "prepare": "npm run build",
