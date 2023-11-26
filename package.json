@@ -13,10 +13,10 @@
     "medusa"
   ],
   "scripts": {
-    "serve": "medusa start",
+    "serve": "node --optimize_for_size --max_old_space_size=460 medusa start",
     "start": "medusa develop",
     "heroku-postbuild": "medusa migrations run",
-    "prepare": "NODE_OPTIONS="--max-old-space-size=8192" npm run build",
+    "prepare": "npm run build",
     "build": "babel src -d dist --extensions \".ts,.js\""
 },
   "dependencies": {
