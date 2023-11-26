@@ -13,7 +13,7 @@
     "medusa"
   ],
   "scripts": {
-    "serve": "node --optimize_for_size --max_old_space_size=460 medusa start",
+    "serve": "medusa start",
     "start": "medusa develop",
     "heroku-postbuild": "medusa migrations run",
     "prepare": "npm run build",
