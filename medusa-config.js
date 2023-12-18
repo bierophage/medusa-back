@@ -19,7 +19,7 @@ switch (process.env.NODE_ENV) {
 
 try {
   dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
-} catch (e) {}
+} catch (e) { }
 
 // CORS when consuming Medusa from admin
 const ADMIN_CORS =
@@ -55,17 +55,18 @@ const plugins = [
   {
     resolve: `medusa-file-s3`,
     options: {
-        s3_url: process.env.S3_URL,
-        bucket: process.env.S3_BUCKET,
-        region: process.env.S3_REGION,
-        access_key_id: process.env.S3_ACCESS_KEY_ID,
-        secret_access_key: process.env.S3_SECRET_ACCESS_KEY
+      s3_url: process.env.S3_URL,
+      bucket: process.env.S3_BUCKET,
+      region: process.env.S3_REGION,
+      access_key_id: process.env.S3_ACCESS_KEY_ID,
+      secret_access_key: process.env.S3_SECRET_ACCESS_KEY
     },
   }
 ];
 
+
 const modules = {
-  eventBus: {
+  /*eventBus: {
     resolve: "@medusajs/event-bus-redis",
     options: {
       redisUrl: REDIS_URL
@@ -76,33 +77,70 @@ const modules = {
     options: {
       redisUrl: REDIS_URL
     }
-  },
+  },*/
 };
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
 const projectConfig = {
-  jwtSecret: process.env.JWT_SECRET,
-  cookieSecret: process.env.COOKIE_SECRET,
-  store_cors: STORE_CORS,
+  // redis_url: REDIS_URL,
   database_url: DATABASE_URL,
+  database_type: "postgres",
+  store_cors: STORE_CORS,
   admin_cors: ADMIN_CORS,
-  // Uncomment the following lines to enable REDIS
-  redis_url: REDIS_URL
+  database_extra:
+    process.env.NODE_ENV !== "development"
+      ? { ssl: { rejectUnauthorized: false } }
+      : {},
+}
+
+// A REACTIVER POUR PROD METTRE CONDITION qui surcharge si problème
+if (process.env.NODE_ENV == "production") {
+  modules = {
+    eventBus: {
+      resolve: "@medusajs/event-bus-redis",
+      options: {
+        redisUrl: REDIS_URL
+      }
+    },
+    cacheService: {
+      resolve: "@medusajs/cache-redis",
+      options: {
+        redisUrl: REDIS_URL
+      }
+    },
+  };
+  projectConfig['redis_url'] = REDIS_URL;
 };
+
+
+
+// projectConfig = {
+//   jwtSecret: process.env.JWT_SECRET,
+//   cookieSecret: process.env.COOKIE_SECRET,
+//   store_cors: STORE_CORS,
+//   database_url: DATABASE_URL,
+//   admin_cors: ADMIN_CORS,
+//   // Uncomment the following lines to enable REDIS
+//   // redis_url: REDIS_URL
+// };
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
 module.exports = {
-  projectConfig: {
-    redis_url: REDIS_URL,
-    database_url: DATABASE_URL,
-    database_type: "postgres",
-    store_cors: STORE_CORS,
-    admin_cors: ADMIN_CORS,
-    database_extra:
-      process.env.NODE_ENV !== "development"
-        ? { ssl: { rejectUnauthorized: false } }
-        : {},
-  },
+  projectConfig,
+  
+  // {
+  //   // redis_url: REDIS_URL,
+  //   database_url: DATABASE_URL,
+  //   database_type: "postgres",
+  //   store_cors: STORE_CORS,
+  //   admin_cors: ADMIN_CORS,
+  //   database_extra:
+  //     process.env.NODE_ENV !== "development"
+  //       ? { ssl: { rejectUnauthorized: false } }
+  //       : {},
+  // }
   plugins,
   modules,
 };
+
+
